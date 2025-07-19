@@ -24,7 +24,7 @@ namespace engine
         // public static bool useTransitionFrom = false;
         private static void printDoc()
         {
-            Console.WriteLine("\n****************************************************************\nЧтобы изменить настройки или сменить изображение, нажмите q\nЧтобы рисовать, удерживайте левую кнопку мыши\nЧтобы двигать изображение, удерживайте правую кнопку мыши\nЧтобы рисовать переход к текущему символу, удерживайте CTRL\nЧтобы рисовать переход к следующему символу удерживайте SHIFT\nНажмите стрелку в право, чтобы закончить символ и перейти к след. символу без смены названия\nНажмите стрелку в верх, чтобы закончить символ и перейти к след со сменой названия\n****************************************************************\n\nНажмите ENTER");
+            Console.WriteLine("\n****************************************************************\nЧтобы изменить настройки или сменить изображение, нажмите q\nЧтобы рисовать, удерживайте левую кнопку мыши\nЧтобы двигать изображение, удерживайте правую кнопку мыши\nЧтобы рисовать переход к текущему символу, удерживайте CTRL\nЧтобы рисовать переход к следующему символу удерживайте SHIFT\nНажмите стрелку в право, чтобы закончить символ и перейти к след. символу без смены названия\nНажмите стрелку в верх, чтобы сменить название символа\nЧтобы стереть букву, нажмите delete\n****************************************************************\n\nНажмите ENTER");
 
         }
         public static void Start()
@@ -136,6 +136,8 @@ namespace engine
                         curCharName = Console.ReadLine();
                         File.WriteAllText($@"{pathToSaveChars}\{curCharName}.txt", "test");
                         File.Delete($@"{pathToSaveChars}\{curCharName}.txt");
+                        row = true;
+                        Console.WriteLine("Окно открыто");
                         break;
                     }
                     catch (Exception ex)
@@ -212,7 +214,7 @@ namespace engine
                 row = false;
             }
             // lastMousePosL = Input.GetMousePosRel();
-            if (Input.IsPressed(Keys.RIGHT) || Input.IsPressed(Keys.UP))
+            if (Input.IsPressed(Keys.RIGHT))
             {
                 if (!savedFile)
                 {
@@ -223,14 +225,21 @@ namespace engine
                     fileNumber++;
                     pic = new(pathPic);
                 }
-                if (Input.IsPressed(Keys.UP))
-                {
-                    OutputWindow.img.Clear();
-                    OutputWindow.img.MergeRGB(settingsImg);
-                    changeSymbolNameNext = true;
-                    fileNumber = 0;
-                    return;
-                }
+            }
+            if (Input.IsPressed(Keys.UP))
+            {
+                OutputWindow.img.Clear();
+                OutputWindow.img.MergeRGB(settingsImg);
+                changeSymbolNameNext = true;
+                fileNumber = 0;
+                row = true;
+                return;
+            }
+            if (Input.IsPressed(Keys.DELETE))
+            {
+                pic = new(pathPic);
+                fileStringCoords = $"{charBorderStart.x + 1}\n{charBorderStart.y + 1}\n{charBorderEnd.x - 1}\n{charBorderEnd.y - 1}\n";
+                row = true;
             }
 
             int scalingRatio = 5;
