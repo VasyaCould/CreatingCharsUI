@@ -115,6 +115,7 @@ namespace engine
         private static string lastLine = "";
         private static bool savedFile = false;
         public static int fileNumber;
+        public static bool row = true;
         public static void Update()
         {
             if (settingsNext)
@@ -194,7 +195,7 @@ namespace engine
 
 
                 pic.DrawLine(lastMousePosL, coords, color);
-                string curLine = Convert.ToString(coords.x + mapPos.x - charBorderStart.x - 1) + " " + Convert.ToString(coords.y + mapPos.y - charBorderStart.y - 1) + (Input.IsPressed(Keys.CONTROL) ? "T" : Input.IsPressed(Keys.SHIFT) ? "F" : "") + "\n";
+                string curLine = Convert.ToString(coords.x + mapPos.x - charBorderStart.x - 1) + " " + Convert.ToString(coords.y + mapPos.y - charBorderStart.y - 1) + (!row ? "U" : "") + (Input.IsPressed(Keys.CONTROL) ? "T" : Input.IsPressed(Keys.SHIFT) ? "F" : "") + "\n";
                 if (lastLine != curLine) fileStringCoords += curLine;
                 lastLine = curLine;
                 if (savedFile) savedFile = false;
@@ -203,8 +204,13 @@ namespace engine
                 // lastMousePosL = temp;
 
                 // OutputWindow.img.DrawLine(new Vector2int(500, 500), new Vector2int(300, 300), new Color(255, 0, 0));
+                row = true;
             }
-            else firstClickL = true;
+            else
+            {
+                firstClickL = true;
+                row = false;
+            }
             // lastMousePosL = Input.GetMousePosRel();
             if (Input.IsPressed(Keys.RIGHT) || Input.IsPressed(Keys.UP))
             {
@@ -276,16 +282,20 @@ namespace engine
                         Console.WriteLine("Окно окрыто");
                         return;
                     case "1":
-                        Console.WriteLine("This func is not supporting in current version\nSorry!\n");
-                        // while (true)
-                        // {
-                        //     Console.WriteLine("Введите полный путь к изображению (PNG, JPEG, JPG, GIF, BMP, WebP)");
-                        //     try { pic.img = ReadPic.ReadPicM(Console.ReadLine()); break; }
-                        //     catch (Exception ex)
-                        //     {
-                        //         Console.WriteLine("error: " + ex + "\ntry again");
-                        //     }
-                        // }
+                        Console.WriteLine("\nВведите полный путь к изображению (PNG, JPEG, JPG, GIF, BMP, WebP)");
+                        while (true)
+                        {
+                            try
+                            {
+                                pathPic = Console.ReadLine();
+                                pic = new PixArray(pathPic);
+                                break;
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine("error: " + ex + "\nПовторите попытку");
+                            }
+                        }
                         break;
                     case "2":
                         while (true)
