@@ -1,4 +1,4 @@
-using System;   
+using System;   // DCU DigitizationCharsUi
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Channels;
@@ -33,7 +33,7 @@ namespace engine
 
             try { Console.WriteLine(File.ReadAllText("iconSmall.png.txt")); }
             catch { Console.WriteLine("typix"); }
-            Console.WriteLine("\nВведите полный путь к изображению (PNG, JPEG, JPG, GIF, BMP, WebP)");
+            Console.WriteLine("\nDCU\nВведите полный путь к изображению (PNG, JPEG, JPG, GIF, BMP, WebP)");
             while (true)
             {
                 try
@@ -64,7 +64,7 @@ namespace engine
                     Console.WriteLine("error: " + ex + "\nПовторите попытку");
                 }
             }
-            Console.WriteLine("Введите название символа");
+            Console.WriteLine("Введите название символа (символ будет вызван по этому имени в тексте)");
             while (true)
             {
                 try
@@ -218,8 +218,10 @@ namespace engine
             {
                 if (!savedFile)
                 {
-                    File.WriteAllText(pathToSaveChars + @"\" + curCharName + $"{fileNumber}.txt", fileStringCoords);
-                    Console.WriteLine($"Файл {curCharName}{fileNumber}.txt создан в директории {pathToSaveChars}");
+                    if (!Directory.Exists($@"{pathToSaveChars}\DictTypixDCU")) Directory.CreateDirectory($@"{pathToSaveChars}\DictTypixDCU");
+                    if (!Directory.Exists($@"{pathToSaveChars}\DictTypixDCU\{curCharName}")) Directory.CreateDirectory($@"{pathToSaveChars}\DictTypixDCU\{curCharName}");
+                    File.WriteAllText($@"{pathToSaveChars}\DictTypixDCU\{curCharName}\{fileNumber}.txt", fileStringCoords);
+                    Console.WriteLine($@"Файл {fileNumber}.txt создан в директории {pathToSaveChars}\DictTypixDCU\{curCharName}");
                     fileStringCoords = $"{charBorderStart.x + 1}\n{charBorderStart.y + 1}\n{charBorderEnd.x - 1}\n{charBorderEnd.y - 1}\n";
                     savedFile = true;
                     fileNumber++;
@@ -326,7 +328,7 @@ namespace engine
                     case "3":
                         while (true)
                         {
-                            Console.WriteLine("Введите название символа");
+                            Console.WriteLine("Введите название символа (символ будет вызван по этому имени в тексте)");
                             try
                             {
                                 curCharName = Console.ReadLine();

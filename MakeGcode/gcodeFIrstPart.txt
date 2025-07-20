@@ -1,0 +1,14 @@
+M190 S0.0
+M109 S0.0
+G21        ;metric values
+G90        ;absolute positioning
+M107       ;start with the fan off
+G28 X0 Y0  ;move X/Y to min endstops
+G28 Z0     ;move Z to min endstops
+G1 F4800
+;Put printing message on LCD screen
+M117 Typix
+
+;G0 F1000 X91.128 Y93.055 Z0.300
+; -x <- -> +x   +y /\ -y \/   -z down +z up
+
