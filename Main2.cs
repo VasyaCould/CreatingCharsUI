@@ -1,5 +1,6 @@
 using System;   // DCU DigitizationCharsUi
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Channels;
 using System.Transactions;
@@ -19,7 +20,8 @@ namespace engine
         public static PixArray settingsImg = new();
         private static bool settingsNext = false;
         private static bool changeSymbolNameNext = false;
-        public static string pathPic;
+        public static string pathPic = "";
+        private static bool secretPrinterEmu = false;
         // public static bool useTransitionTo = false;
         // public static bool useTransitionFrom = false;
         private static void printDoc()
@@ -39,6 +41,11 @@ namespace engine
                 try
                 {
                     pathPic = Console.ReadLine();
+                    if (pathPic == "Vasya")
+                    {
+                        secretPrinterEmu = true;
+                        return;
+                    }
                     pic = new PixArray(pathPic);
                     break;
                 }
@@ -118,6 +125,12 @@ namespace engine
         public static bool row = true;
         public static void Update()
         {
+            if (secretPrinterEmu)
+            {
+                printerEmu();
+                return;
+            }
+
             if (settingsNext)
             {
                 settingsNext = false;
@@ -363,7 +376,33 @@ namespace engine
                         //     }
                         //     break;
                 }
+
             }
+
+        }
+        private static bool ready = false;
+        private static void printerEmu()
+        {
+            if (ready) return;
+            Console.WriteLine("Укажите путь к .testGcode Включительно");
+            IEnumerable<string> testGcode = File.ReadLines(Console.ReadLine());
+            int count = 0;
+            int[] fourEls = new int[4];
+            foreach (string i in testGcode)
+            {
+                // OutputWindow.img.DrawLine(new(Convert.ToInt32(i), Convert.ToInt329), new(Convert.ToInt32(i)), new(255, 0, 0));
+                Console.WriteLine(i);
+                fourEls[count] = Convert.ToInt32(i);
+                count++;
+                if (count % 2 == 0)
+                {
+                    OutputWindow.img.DrawLine(new(fourEls[2], fourEls[3]), new(fourEls[0], fourEls[1]), new(255, 0, 0));
+                    if (count == 4) count = 0;
+                    Console.WriteLine("");
+                }
+            }
+
+            ready = true;
         }
     }
 }

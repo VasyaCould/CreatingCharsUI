@@ -35,6 +35,8 @@ if(text == ""):
     with open(pathToText) as file: text = file.read()
 
 fileStringGcode = ""
+resLine = ""
+resLineTestGcode = ""
 currentPosX = 0
 currentPosY = 0
 countLosses = 0
@@ -44,7 +46,7 @@ for i in text:
         
         numOfcharsVars = os.listdir(f"{pathToDict}\\DictTypixDCU\\{i}")[-1].replace(".txt", "")
 
-        with open(f"{pathToDict}\\DictTypixDCU\\{i}\\{randint(0,numOfcharsVars)}.txt") as file:
+        with open(f"{pathToDict}\\DictTypixDCU\\{i}\\{randint(0, int(numOfcharsVars))}.txt") as file:
             '''lines = file.readlines()
             minY = 0
             maxY = 0
@@ -75,26 +77,37 @@ for i in text:
             lines = file.readlines()
             for i2 in range(4, len(lines)):
                 x = ""
-                for i3 in lines[i2]:
-                    if(i3 == " "): break
-                    x += i3
                 y = ""
+                secondStarted = False
                 for i3 in lines[i2]:
-                    try:
-                        int(i3)
-                        str(i3)
-                        y += i3
-                    except:
-                        break
+                    if(secondStarted):
+                        try:
+                            int(i3)
+                            str(i3)
+                            y += i3
+                        except:
+                            break
+                    if(i3 == " "): secondStarted = True
+                    if(not secondStarted): x += i3
+                    
             
-                resLine = "G0 F1000 X"
+                resLine += "\nG0 F1000 X"
+                resLineTestGcode += "\n" + str(int(x) + currentPosX) + "\n" + str(int(y) + currentPosY)
 
                 resLine += str(int(x) + currentPosX) + " Y" + str(int(y) + currentPosY) 
 
-            currentPosX = int(lines[2]) - int(lines[0])
-            currentPosY = int(lines[3]) - int(lines[1])
+            #currentPosX = int(lines[2]) - int(lines[0])
+            currentPosX += 150
+            #currentPosY = int(lines[3]) - int(lines[1]) no
     except:
         print("В словаре отсутствует " + i)
         countLosses += 1
+
+with open(resPath + "\\" + resName + ".gcode", "w") as file:
+    file.write(resLine)
+with open(resPath + "\\" + resName + ".testGcode", "w") as file:
+    file.write(resLineTestGcode[1:-1])
+
+
 print("Готово!")
 print(f"Отсутствующие файлы в словаре: {countLosses} из {len(text)} ({int(countLosses / len(text) * 100)}%)")
