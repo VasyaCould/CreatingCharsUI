@@ -285,7 +285,7 @@ namespace engine
 
             OutputWindow.img.Clear();
             OutputWindow.img.MergeRGB(pic.ScaleImageNearest(mapScale.x, mapScale.y), mapPos);
-            // pic.MergeRGBA(extraPic);// gpt про simd там он про ассемблер говорит и про процессоры
+            // // pic.MergeRGBA(extraPic);// gpt про simd там он про ассемблер говорит и про процессоры
             OutputWindow.img.DrawLine(new(charBorderStart.x, charBorderStart.y), new(charBorderEnd.x, charBorderStart.y), new Color(255, 0, 255));
             OutputWindow.img.DrawLine(new Vector2int(charBorderEnd.x, charBorderStart.y), new(charBorderEnd.x, charBorderEnd.y), new Color(255, 0, 255));
             OutputWindow.img.DrawLine(new(charBorderEnd.x, charBorderEnd.y), new Vector2int(charBorderStart.x, charBorderEnd.y), new Color(255, 0, 255));
@@ -391,16 +391,20 @@ namespace engine
             foreach (string i in testGcode)
             {
                 // OutputWindow.img.DrawLine(new(Convert.ToInt32(i), Convert.ToInt329), new(Convert.ToInt32(i)), new(255, 0, 0));
-                Console.WriteLine(i);
+                // Console.WriteLine(i);
                 fourEls[count] = Convert.ToInt32(i);
                 count++;
                 if (count % 2 == 0)
                 {
-                    OutputWindow.img.DrawLine(new(fourEls[2], fourEls[3]), new(fourEls[0], fourEls[1]), new(255, 0, 0));
+                    OutputWindow.img.DrawLine(new(fourEls[0], fourEls[1]), new(fourEls[2], fourEls[3]), new(255, 0, 0));
                     if (count == 4) count = 0;
-                    Console.WriteLine("");
+                    // Console.WriteLine("");
                 }
             }
+
+            // OutputWindow.img.DrawLine(new(500, 300), Input.GetMousePosRel(), new(255, 255, 255));
+            // OutputWindow.img.SetPixel(1, 1, new(255, 255, 255));
+            // OutputWindow.img.SetPixel(1920, 1080, new(255, 255, 255));
 
             ready = true;
         }

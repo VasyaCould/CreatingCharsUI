@@ -10,6 +10,7 @@ using System.Runtime.Intrinsics.X86;
 using SkiaSharp;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Net;
 
 namespace engine
 {
@@ -104,12 +105,19 @@ namespace engine
                 img = bmp.Bytes;
                 Width = bmp.Width;
                 Height = bmp.Height;
-                if (bmp.AlphaType == SKAlphaType.Unpremul) rgba = true;
-                else rgba = false;
-                bgrToRgb(img);
+                if (bmp.AlphaType == SKAlphaType.Unpremul)
+                {
+                    rgba = true;
+                    bgraToRgba();
+                }
+                else
+                {
+                    rgba = false;
+                    bgrToRgb();
+                }
             }
         }
-        public static void bgrToRgb(byte[] img)
+        public void bgrToRgb()
         {
             for (int i = 0, j = 0; i < img.Length; i += 4, j += 3)
             {
@@ -321,38 +329,101 @@ namespace engine
         }
         public void DrawLine(Vector2int firstPoint, Vector2int endPoint, Color color)
         {
-            int x = endPoint.x - firstPoint.x;
-            int y = endPoint.y - firstPoint.y;
-            bool xLess = Math.Abs(x) < Math.Abs(y) ? true : false;
-            int steps = xLess ? Math.Abs(y) : Math.Abs(x);
-            int steps2 = xLess ? x : y;
-            for (int i = 0; i < steps; i++)
+            int dx = Math.Abs(endPoint.x - firstPoint.x);//gpt
+            int dy = Math.Abs(endPoint.y - firstPoint.y);
+            int sx = firstPoint.x < endPoint.x ? 1 : -1;
+            int sy = firstPoint.y < endPoint.y ? 1 : -1;
+            int err = dx - dy;
+
+            while (true)
             {
-                if (xLess)
+                if(firstPoint.x > 0 && firstPoint.x <= this.Width && firstPoint.y > 0 && firstPoint.y <= this.Height)SetPixel(firstPoint.x, firstPoint.y, color);
+
+                if (firstPoint.x == endPoint.x && firstPoint.y == endPoint.y)
+                    break;
+
+                int e2 = 2 * err;
+                if (e2 > -dy)
                 {
-                    if (y < 0) firstPoint.y--;
-                    else firstPoint.y++;
+                    err -= dy;
+                    firstPoint.x += sx;
                 }
-                else
+                if (e2 < dx)
                 {
-                    if (x < 0) firstPoint.x--;
-                    else firstPoint.x++;
+                    err += dx;
+                    firstPoint.y += sy;
                 }
-                if (steps2 != 0 && steps / steps2 != 0 && i % (steps / steps2) == 0)//steps2 != 0) if (i % (steps2 / steps) == 0)
-                {
-                    if (xLess)
-                    {
-                        if (x < 0) firstPoint.x--;
-                        else firstPoint.x++;
-                    }
-                    else
-                    {
-                        if (y < 0) firstPoint.y--;
-                        else firstPoint.y++;
-                    }
-                }
-                if (firstPoint.x < OutputWindow.Width && firstPoint.x > 0 && firstPoint.y < OutputWindow.Height && firstPoint.y > 0) this.SetPixel(firstPoint.x, firstPoint.y, color);
-            }
+            }//gpt
+
+
+            // int stepsX = endPoint.x - firstPoint.x;
+            // bool xNegative = stepsX < 0;
+            // int stepsY = endPoint.y - firstPoint.y;
+            // bool yNegative = stepsY < 0;
+            // bool xLess = Math.Abs(stepsX) < Math.Abs(stepsY);
+            // Vector2int curPos = firstPoint;
+            // float a;
+            // if ((xLess ? stepsX : stepsY) != 0) a = (xLess ? stepsY : stepsX) / (xLess ? stepsX : stepsY);
+            // else a = 1;
+
+            // OutputWindow.img.SetPixel(curPos.x, curPos.y, color);
+
+            // for (int i = 1; i <= (xLess ? Math.Abs(stepsY) : Math.Abs(stepsX)); i++)
+            // {
+            //     if (xLess)
+            //     {
+            //         curPos.y += yNegative ? -1 : 1;
+            //         if (a != 0 && i % a == 0) curPos.x += xNegative ? -1 : 1;
+            //     }
+            //     else
+            //     {
+            //         curPos.x += (xNegative ? -1 : 1);
+            //         if (a != 0 && i % a == 0) curPos.y += (yNegative ? -1 : 1);
+            //     }
+            //     // Console.Write(curPos.x);
+            //     // Console.Write(" ");
+            //     // Console.Write(curPos.y);
+            //     // Console.WriteLine("");
+
+            //     this.SetPixel(curPos.x, curPos.y, color);
+            // }
+
+
+
+            // int x = endPoint.x - firstPoint.x;
+            // int y = endPoint.y - firstPoint.y + 1;
+            // bool xLess = Math.Abs(x) < Math.Abs(y) ? true : false;
+            // int steps = xLess ? Math.Abs(y) : Math.Abs(x);
+            // int steps2 = xLess ? x : y;
+            // for (int i = 0; i < steps; i++)
+            // {
+            //     if (xLess)
+            //     {
+            //         if (y < 0) firstPoint.y--;
+            //         else firstPoint.y++;
+            //     }
+            //     else
+            //     {
+            //         if (x < 0) firstPoint.x--;
+            //         else firstPoint.x++;
+            //     }
+            //     if (steps2 != 0 && steps / steps2 != 0 && i % (steps / steps2) == 0)//steps2 != 0) if (i % (steps2 / steps) == 0)
+            //     {
+            //         if (xLess)
+            //         {
+            //             if (x < 0) firstPoint.x--;
+            //             else firstPoint.x++;
+            //         }
+            //         else
+            //         {
+            //             if (y < 0) firstPoint.y--;
+            //             else firstPoint.y++;
+            //         }
+            //     }
+            //     if (firstPoint.x < OutputWindow.Width && firstPoint.x > 0 && firstPoint.y < OutputWindow.Height && firstPoint.y > 0) this.SetPixel(firstPoint.x - 1, firstPoint.y, color);
+            // }
+
+
             // int x = endPoint.x - firstPoint.x;
             // int y = endPoint.y - firstPoint.y;
             // bool xLess = Math.Abs(x) < Math.Abs(y) ? true : false;
@@ -374,19 +445,19 @@ namespace engine
 
         public int GetIndexR(int x, int y)
         {
-            return (x + Width * (y - 1)) * (rgba ? 4 : 3) - 1;
+            return ((x + Width * (y - 1) - 1) * (rgba ? 4 : 3)) + 2;
         }
         public int GetIndexG(int x, int y)
         {
-            return (x + Width * (y - 1)) * (rgba ? 4 : 3);
+            return (x + Width * (y - 1) - 1) * (rgba ? 4 : 3) + 1;
         }
         public int GetIndexB(int x, int y)
         {
-            return ((x + Width * (y - 1)) * (rgba ? 4 : 3)) + 1;
+            return ((x + Width * (y - 1) - 1) * (rgba ? 4 : 3);
         }
         public int GetIndexA(int x, int y)
         {
-            return rgba ? ((x + Width * (y - 1)) * (rgba ? 4 : 3)) + 2 : (byte)255;
+            return rgba ? ((x + Width * (y - 1) - 1) * (rgba ? 4 : 3)) + 3 : (byte)255;
         }
         public Color GetPixel(int x, int y)
         {
